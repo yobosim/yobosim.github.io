@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <style>
+        #player{position:absolute;left:500px;top:200px;}
+        #box{position:absolute;left:670px;top:397px;width:260px;height:18px;border: 1px solid black;}
+        #box2{position:absolute;left:670px;top:418px;width:260px;height:18px;border: 1px solid black;}
+        #box3{position:absolute;left:670px;top:439px;width:260px;height:18px;border: 1px solid black;}
+        #box4{position:absolute;left:670px;top:460px;width:260px;height:18px;border: 1px solid black;}
+        #box:hover {background-color: skyblue;opacity: 0.5;}
+        #box2:hover {background-color: skyblue;opacity: 0.5;}
+        #box3:hover {background-color: skyblue;opacity: 0.5;}
+        #box4:hover {background-color: skyblue;opacity: 0.5;}
+        #wrong{text-align: center;padding:600px 0;color:red;}
+        #correct{text-align: center;padding:600px 0;color:green;}
+        #instructions{text-align: center;padding:100px 0;color:black;}     
+      </style>
+  </head>
+  <body>
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    <div id="player"></div>
+    <div id="box" onclick="wrong()"> </div>
+    <div id="box2" onclick="wrong()"> </div>
+    <div id="box3" onclick="correct()"> </div>
+    <div id="box4" onclick="wrong()"> </div>
+    <div id="wrong">
+        <p1>Wrong answer. Showing Hint.</p1>
+    </div>
+    <div id="correct">
+        <p1>Right answer. Nice Job!</p1>
+    </div>
+    <div id="instructions">
+        <p1>Please do not skip the video. Quiz is at 4:45.</p1>
+    </div>
+    <script>
+      // 2. This code loads the IFrame Player API code asynchronously.
+      document.getElementById('box').style['display']='none';
+      document.getElementById('box2').style['display']='none';
+      document.getElementById('box3').style['display']='none';
+      document.getElementById('box4').style['display']='none';
+      document.getElementById('wrong').style['display']='none';
+      document.getElementById('correct').style['display']='none';
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: 'rz11GLlt8Ak',
+          playerVars: {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0},
+          events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange,
+          }
+        });
+            document.getElementById('player').style['z-index']=-10;
+            document.getElementById('player').style['-webkit-transform']='translateZ(0)';
+      }
+      
+
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      var done = false;
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) {
+          setTimeout(pauseVideo, 285000);
+          done = true;
+        }
+        MyPlayerState=event.data
+      }
+        
+      function pauseVideo() {
+        player.pauseVideo()
+        document.getElementById('box').style['display']='block';
+        document.getElementById('box2').style['display']='block';
+        document.getElementById('box3').style['display']='block';
+        document.getElementById('box4').style['display']='block';
+      }
+      
+      function wrong() {
+          document.getElementById('correct').style['display']='none';
+          document.getElementById('wrong').style['display']='block';
+          player.seekTo(102, true);   
+          player.playVideo();
+          document.getElementById('box').style['display']='none';
+          document.getElementById('box2').style['display']='none';
+          document.getElementById('box3').style['display']='none';
+          document.getElementById('box4').style['display']='none';
+          
+      }
+      function correct() {
+          document.getElementById('wrong').style['display']='none';
+          document.getElementById('correct').style['display']='block';
+          player.playVideo();
+          document.getElementById('box').style['display']='none';
+          document.getElementById('box2').style['display']='none';
+          document.getElementById('box3').style['display']='none';
+          document.getElementById('box4').style['display']='none';
+      }
+    </script>
+    </body>
+</html>
