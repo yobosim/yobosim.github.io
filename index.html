@@ -31,7 +31,7 @@
         <p1>Right answer. Nice Job!</p1>
     </div>
     <div id="instructions">
-        <p1>Please do not skip the video. Quiz is at 4:45.</p1>
+        <p1>Quiz is at 4:45.</p1>
     </div>
     <script>
       // 2. This code loads the IFrame Player API code asynchronously.
@@ -41,6 +41,8 @@
       document.getElementById('box4').style['display']='none';
       document.getElementById('wrong').style['display']='none';
       document.getElementById('correct').style['display']='none';
+      var stopPlayAt = 286, // Stop play at time in seconds
+      stopPlayTimer;   // Reference to settimeout call
       var tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -73,42 +75,46 @@
       // 5. The API calls this function when the player's state changes.
       //    The function indicates that when playing a video (state=1),
       //    the player should play for six seconds and then stop.
-      var done = false;
       function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING && !done) {
-          setTimeout(pauseVideo, 285000);
-          done = true;
+        var time, rate, remainingTime;
+        clearTimeout(stopPlayTimer);
+        if (event.data == YT.PlayerState.PLAYING) {
+          time = player.getCurrentTime();
+          // Add .4 of a second to the time in case it's close to the current time
+          // (The API kept returning ~9.7 when hitting play after stopping at 10s)
+          if (time + .4 < stopPlayAt) {
+            rate = player.getPlaybackRate();
+            remainingTime = (stopPlayAt - time) / rate;
+            stopPlayTimer = setTimeout(pauseVideo, remainingTime * 1000);
+          }
         }
-        MyPlayerState=event.data
       }
-        
       function pauseVideo() {
-        player.pauseVideo()
         document.getElementById('box').style['display']='block';
         document.getElementById('box2').style['display']='block';
         document.getElementById('box3').style['display']='block';
         document.getElementById('box4').style['display']='block';
+        player.pauseVideo()
       }
       
       function wrong() {
           document.getElementById('correct').style['display']='none';
           document.getElementById('wrong').style['display']='block';
-          player.seekTo(102, true);   
-          player.playVideo();
           document.getElementById('box').style['display']='none';
           document.getElementById('box2').style['display']='none';
           document.getElementById('box3').style['display']='none';
           document.getElementById('box4').style['display']='none';
-          
+          player.seekTo(102, true);
+          player.playVideo();
       }
       function correct() {
           document.getElementById('wrong').style['display']='none';
           document.getElementById('correct').style['display']='block';
-          player.playVideo();
           document.getElementById('box').style['display']='none';
           document.getElementById('box2').style['display']='none';
           document.getElementById('box3').style['display']='none';
           document.getElementById('box4').style['display']='none';
+          player.playVideo();
       }
     </script>
     </body>
